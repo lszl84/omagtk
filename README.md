@@ -39,9 +39,13 @@ Install the package from the [latest release](https://github.com/lszl84/omagtk/r
 then set it up as your desktop user (not root):
 
 ```sh
-sudo pacman -U https://github.com/lszl84/omagtk/releases/download/v0.1.0/omagtk-0.1.0-1-any.pkg.tar.zst
+curl -LO https://github.com/lszl84/omagtk/releases/download/v0.1.0/omagtk-0.1.0-1-any.pkg.tar.zst
+sudo pacman -U omagtk-0.1.0-1-any.pkg.tar.zst
 omagtk setup
 ```
+
+The package isn't GPG-signed, so pacman installs it from a downloaded file
+but refuses to install it straight from the URL.
 
 That's it. Omagtk is active and will follow every Omarchy theme change from
 now on. To update, install the newer release the same way, then run
