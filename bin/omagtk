@@ -27,6 +27,8 @@ Commands:
   apply            Regenerate colors from the current Omarchy theme and reload
                    running GTK3 apps (what the hook runs on theme changes)
   apply --colors   Only regenerate colors, without touching GTK settings
+  watch            Keep GTK3 apps on Omagtk while Omarchy changes themes,
+                   instead of showing Adwaita until the hook runs
   remove           Undo setup for this user and switch GTK back to Adwaita
   status           Show whether Omagtk is set up and active
   version          Print the version
@@ -187,16 +189,28 @@ EOF
   mv "$tmp" "$out"
 }
 
+# A fingerprint of the theme files GTK would load, so activate can tell whether
+# running apps already show exactly these files.
+theme_stamp() {
+  cat "$THEME_DIR/index.theme" "$THEME_DIR"/gtk-3.0/*.css 2>/dev/null | cksum
+}
+
 # GTK only rereads theme CSS when the theme name changes, so bounce through
-# another theme when Omagtk is already active.
+# another theme when Omagtk is already active, unless nothing has changed
+# since the last time it was activated.
 activate() {
   has_session || return 0
 
+  local stamp_file="$THEME_DIR/.applied" stamp
+  stamp=$(theme_stamp)
+
   if [[ $(gsettings get $SCHEMA gtk-theme) == "'$THEME_NAME'" ]]; then
+    [[ -f $stamp_file && $(<"$stamp_file") == "$stamp" ]] && return 0
     gsettings set $SCHEMA gtk-theme "Adwaita"
     sleep 0.3
   fi
   gsettings set $SCHEMA gtk-theme "$THEME_NAME"
+  echo "$stamp" >"$stamp_file"
 }
 
 cmd_apply() {
@@ -240,6 +254,37 @@ cmd_remove() {
   echo "Omagtk removed for this user."
 }
 
+# On a theme change, Omarchy switches GTK to Adwaita and only runs the
+# theme-set hook after all its other theme commands finish, so GTK apps show
+# Adwaita for a second or more. Watch the setting and switch straight back.
+# Runs until killed; the Omarchy plugin keeps it running.
+cmd_watch() {
+  has_session || fail "watch needs a desktop session with gsettings"
+
+  local theme_name_file="$HOME/.local/state/omarchy/current/theme.name"
+  local monitor monitor_pid key value
+
+  exec {monitor}< <(exec gsettings monitor $SCHEMA gtk-theme)
+  monitor_pid=$!
+  trap 'kill "$monitor_pid" 2>/dev/null' EXIT
+  trap 'exit 0' TERM INT HUP
+
+  while read -r -u "$monitor" key value; do
+    [[ $value == "'Adwaita'" || $value == "'Adwaita-dark'" ]] || continue
+    # Omagtk was removed.
+    [[ -d $THEME_DIR/gtk-3.0 ]] || continue
+    # Only during a theme change, so choosing Adwaita yourself still sticks.
+    [[ -f $theme_name_file ]] || continue
+    ((EPOCHSECONDS - $(stat -c %Y "$theme_name_file") <= 30)) || continue
+
+    # The plugin usually has the colors ready by now. GTK shows Adwaita until
+    # the next line, so flip the setting first and record the stamp after.
+    [[ $THEME_DIR/gtk-3.0/colors.css -nt $COLORS_TOML ]] || write_colors
+    gsettings set $SCHEMA gtk-theme "$THEME_NAME"
+    theme_stamp >"$THEME_DIR/.applied"
+  done
+}
+
 cmd_status() {
   local active="unknown"
   has_session && active=$(gsettings get $SCHEMA gtk-theme)
@@ -255,6 +300,7 @@ case "${1:-}" in
   setup) cmd_setup ;;
   apply) cmd_apply "${2:-}" ;;
   remove) cmd_remove ;;
+  watch) cmd_watch ;;
   status) cmd_status ;;
   version | --version | -V) echo "omagtk $VERSION" ;;
   help | --help | -h) usage ;;

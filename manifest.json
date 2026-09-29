@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "com.devmindscape.omagtk",
+  "name": "Omagtk",
+  "version": "0.1.0",
+  "author": "Luke | DevMindscape",
+  "license": "MIT",
+  "description": "A modern GTK3 theme that follows your Omarchy theme: Thunar and every other GTK3 app recolor on each theme change.",
+  "kinds": [
+    "service"
+  ],
+  "entryPoints": {
+    "service": "Service.qml"
+  }
+}

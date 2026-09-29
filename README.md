@@ -74,6 +74,25 @@ To hack on the theme, use `./install.sh --link`. It links to your checkout
 instead, so your edits apply straight away. Run `omagtk apply` to reload
 open apps.
 
+### As an Omarchy plugin
+
+```sh
+omarchy plugin add https://github.com/lszl84/omagtk.git --enable
+```
+
+Enabling the plugin sets Omagtk up the same way `./install.sh --link` does,
+and that **switches your GTK theme to Omagtk**. It happens once, on the
+first shell start after you enable it. If Omagtk is already installed, by
+the package or by `install.sh`, the plugin skips the setup.
+
+The plugin also runs `omagtk watch`, which keeps GTK3 apps from flashing
+Adwaita while Omarchy changes themes (see [How it works](#how-it-works)).
+It's worth enabling for that alone, even if you installed the package.
+
+Omarchy keeps the clone in `~/.config/omarchy/plugins/com.devmindscape.omagtk`,
+and `~/.local/bin/omagtk` links to it. Disabling the plugin doesn't undo the
+setup; to remove Omagtk, see [Uninstall](#uninstall).
+
 ### What `omagtk setup` does
 
 The theme's CSS is shared, but its colors are per user, so setup creates:
@@ -96,6 +115,14 @@ omagtk remove
 This removes the theme folder and the hook, and hands GTK back to Omarchy's
 default Adwaita. Then remove the package with `sudo pacman -R omagtk`, or run
 `./uninstall.sh` if you used `install.sh`.
+
+If you installed it as an Omarchy plugin, run the clone's uninstall script
+before removing the plugin, because the `omagtk` command lives in the clone:
+
+```sh
+~/.config/omarchy/plugins/com.devmindscape.omagtk/uninstall.sh
+omarchy plugin remove com.devmindscape.omagtk
+```
 
 ## How it works
 
@@ -125,7 +152,14 @@ That is why a single stylesheet suits Matte Black and Catppuccin Latte alike.
 GTK only rereads theme CSS when the theme *name* changes. On a theme switch,
 Omarchy first resets GTK to Adwaita, and the hook then sets it back to Omagtk,
 so running apps reload. When you run `omagtk apply` by hand, it does that
-bounce itself.
+bounce itself, unless the apps already show exactly the current files.
+
+Omarchy runs the hook only after all its other theme commands finish, so
+running apps show Adwaita for a second or so in between. `omagtk watch`
+closes that gap: it watches the GTK theme setting and switches back to
+Omagtk as soon as Omarchy resets it, typically within about 0.1 s. The
+Omarchy plugin keeps it running and generates the new colors as soon as the
+theme changes, so the watcher only has to flip the setting.
 
 The theme also defines the standard color names apps use in their own CSS
 (`theme_selected_bg_color`, `accent_bg_color`, `window_bg_color`, …), so apps
