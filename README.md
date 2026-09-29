@@ -9,18 +9,6 @@ leaves your icon theme alone.
 
 ![Thunar and the Omagtk showcase following Tokyo Night, Vantablack, White, Catppuccin and Everforest](docs/omagtk.gif)
 
-<p align="center">
-  <img src="docs/tokyo-night-controls.png" alt="Omagtk with Tokyo Night" width="49%">
-  <img src="docs/catppuccin-latte-controls.png" alt="Omagtk with Catppuccin Latte" width="49%">
-</p>
-<p align="center">
-  <img src="docs/gruvbox-lists.png" alt="Omagtk with Gruvbox" width="49%">
-  <img src="docs/rose-pine-text.png" alt="Omagtk with Rose Pine" width="49%">
-</p>
-<p align="center">
-  <img src="docs/everforest-inputs.png" alt="Omagtk with Everforest" width="49%">
-</p>
-
 ## Features
 
 - **Follows Omarchy automatically.** A theme-set hook recolors it on every
