@@ -1,0 +1,43 @@
+name: Release
+
+# Push a tag like v0.1.0 (matching pkgver in PKGBUILD) to build the Arch
+# package and publish it as a GitHub release.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    container: archlinux:base-devel
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check version
+        run: |
+          pkgver=$(sed -n 's/^pkgver=//p' PKGBUILD)
+          cliver=$(sed -n 's/^VERSION="\(.*\)"/\1/p' bin/omagtk)
+          if [ "v$pkgver" != "$GITHUB_REF_NAME" ] || [ "$cliver" != "$pkgver" ]; then
+            echo "Tag $GITHUB_REF_NAME, PKGBUILD $pkgver and bin/omagtk $cliver must all match" >&2
+            exit 1
+          fi
+
+      - name: Build package
+        run: |
+          useradd -m builder
+          chown -R builder .
+          su builder -c "makepkg --nodeps --noconfirm"
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          pacman -Sy --noconfirm github-cli
+          gh release create "$GITHUB_REF_NAME" ./*.pkg.tar.zst \
+            --title "Omagtk $GITHUB_REF_NAME" \
+            --generate-notes

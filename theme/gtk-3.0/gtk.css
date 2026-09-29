@@ -2081,13 +2081,14 @@ scrollbar.overlay-indicator:not(.dragging):not(.hovering) slider {
   background-color: @omg_fg;
 }
 
+/* Stepper arrows (for apps that enable them) only appear on hover, along
+   with the full-width scrollbar; the thin indicator shows just the slider. */
 scrollbar.overlay-indicator:not(.dragging):not(.hovering) button {
-  min-width: 5px;
-  min-height: 5px;
-  background-color: @omg_fg;
-  background-clip: padding-box;
-  border-radius: 100%;
-  border: 1px solid transparent;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  background: none;
   -gtk-icon-source: none;
 }
 

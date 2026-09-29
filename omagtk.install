@@ -1,0 +1,26 @@
+post_install() {
+  printf '%s\n' \
+    '' \
+    '==> To finish, run this as your desktop user (not root):' \
+    '      omagtk setup' \
+    '' \
+    '    GTK3 apps will then follow every Omarchy theme change.' \
+    ''
+}
+
+post_upgrade() {
+  printf '%s\n' \
+    '' \
+    '==> Omagtk updated. Run "omagtk apply" to reload open GTK3 apps.' \
+    ''
+}
+
+pre_remove() {
+  printf '%s\n' \
+    '' \
+    '==> Run "omagtk remove" as each desktop user first to switch GTK back to' \
+    '    Adwaita and remove the Omarchy hook. If you already removed the package,' \
+    '    delete ~/.local/share/themes/Omagtk and' \
+    '    ~/.config/omarchy/hooks/theme-set.d/omagtk by hand.' \
+    ''
+}

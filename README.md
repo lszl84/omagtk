@@ -43,43 +43,76 @@ leaves your icon theme alone.
 
 ## Install
 
+### Arch / Omarchy (recommended)
+
+Install the package from the [latest release](https://github.com/lszl84/omagtk/releases/latest),
+then set it up as your desktop user (not root):
+
+```sh
+sudo pacman -U https://github.com/lszl84/omagtk/releases/download/v0.1.0/omagtk-0.1.0-1-any.pkg.tar.zst
+omagtk setup
+```
+
+That's it. Omagtk is active and will follow every Omarchy theme change from
+now on. To update, install the newer release the same way, then run
+`omagtk apply` to reload open apps.
+
+Or build the package yourself from a checkout:
+
+```sh
+git clone https://github.com/lszl84/omagtk.git
+cd omagtk
+makepkg -si
+omagtk setup
+```
+
+### Without a package
+
 ```sh
 git clone https://github.com/lszl84/omagtk.git
 cd omagtk
 ./install.sh
 ```
 
-That's it. Omagtk is active and will follow every Omarchy theme change from
-now on. The installer puts these in place:
+This copies everything into `~/.local` and runs `omagtk setup`.
+
+To hack on the theme, use `./install.sh --link`. It links to your checkout
+instead, so your edits apply straight away. Run `omagtk apply` to reload
+open apps.
+
+### What `omagtk setup` does
+
+The theme's CSS is shared, but its colors are per user, so setup creates:
 
 | What | Where |
 | --- | --- |
-| The theme | `~/.local/share/themes/Omagtk` |
-| `omagtk-apply`, which regenerates the colors | `~/.local/bin/omagtk-apply` |
-| An Omarchy hook that runs `omagtk-apply` on theme changes | `~/.config/omarchy/hooks/theme-set.d/omagtk` |
+| Your theme folder: links to the shared CSS, plus your generated `colors.css` | `~/.local/share/themes/Omagtk` |
+| An Omarchy hook that runs `omagtk apply` on theme changes | `~/.config/omarchy/hooks/theme-set.d/omagtk` |
 
-To hack on the theme, use `./install.sh --link`. It symlinks the files to your
-checkout instead of copying them, so your edits apply straight away. Run
-`omagtk-apply` to reload open apps.
+It then sets the GTK theme to Omagtk. Run `omagtk status` to check.
 
 ### Uninstall
 
+First, as your desktop user:
+
 ```sh
-./uninstall.sh
+omagtk remove
 ```
 
-This removes everything above and hands GTK back to Omarchy's default Adwaita.
+This removes the theme folder and the hook, and hands GTK back to Omarchy's
+default Adwaita. Then remove the package with `sudo pacman -R omagtk`, or run
+`./uninstall.sh` if you used `install.sh`.
 
 ## How it works
 
 ```
-colors.toml ──omagtk-apply──▶ colors.css ──@import──▶ gtk.css
+colors.toml ──omagtk apply──▶ colors.css ──@import──▶ gtk.css
  (Omarchy)                   (a few colors)          (hand-written theme)
 ```
 
 [`theme/gtk-3.0/gtk.css`](theme/gtk-3.0/gtk.css) is the whole theme, written by
 hand. It never names a concrete color. Instead it imports `colors.css`, a
-dozen `@define-color` lines that [`omagtk-apply`](bin/omagtk-apply) generates
+dozen `@define-color` lines that [`omagtk apply`](bin/omagtk) generates
 from `~/.local/state/omarchy/current/theme/colors.toml`:
 
 - The theme's `background`, `foreground`, `accent`, `red`, `green`, `yellow`, …
@@ -97,7 +130,7 @@ That is why a single stylesheet suits Matte Black and Catppuccin Latte alike.
 
 GTK only rereads theme CSS when the theme *name* changes. On a theme switch,
 Omarchy first resets GTK to Adwaita, and the hook then sets it back to Omagtk,
-so running apps reload. When you run `omagtk-apply` by hand, it does that
+so running apps reload. When you run `omagtk apply` by hand, it does that
 bounce itself.
 
 The theme also defines the standard color names apps use in their own CSS
@@ -119,13 +152,13 @@ Full-color icons, such as app logos and folders, keep their own look.
 ## Previewing other palettes
 
 To render the theme with any Omarchy palette without switching your desktop,
-point `omagtk-apply` at that palette's `colors.toml` and pass `--colors`:
+point `omagtk apply` at that palette's `colors.toml` and pass `--colors`:
 
 ```sh
-OMAGTK_COLORS_TOML=/usr/share/omarchy/themes/nord/colors.toml omagtk-apply --colors
+OMAGTK_COLORS_TOML=/usr/share/omarchy/themes/nord/colors.toml omagtk apply --colors
 ```
 
-Then run `omagtk-apply` again to go back to your current theme.
+Then run `omagtk apply` again to go back to your current theme.
 
 ## Limitations
 

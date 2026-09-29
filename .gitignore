@@ -1,5 +1,10 @@
 theme/gtk-3.0/colors.css
 __pycache__/
 
+# makepkg output
+/src/
+/pkg/
+*.pkg.tar.*
+
 # Local widget showcase used for development, not published.
 showcase/
