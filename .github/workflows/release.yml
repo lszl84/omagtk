@@ -37,7 +37,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          pacman -Sy --noconfirm github-cli
+          pacman -Syu --noconfirm github-cli
           gh release create "$GITHUB_REF_NAME" ./*.pkg.tar.zst \
             --title "Omagtk $GITHUB_REF_NAME" \
             --generate-notes
