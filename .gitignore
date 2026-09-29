@@ -1,0 +1,5 @@
+theme/gtk-3.0/colors.css
+__pycache__/
+
+# Local widget showcase used for development, not published.
+showcase/

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Omarchy theme-set hook: recolor the Omagtk GTK3 theme for the new theme.
+# omarchy-theme-set-gnome has just switched GTK back to Adwaita, so this also
+# puts Omagtk back in place.
+
+if [[ -x $HOME/.local/bin/omagtk-apply ]]; then
+  exec "$HOME/.local/bin/omagtk-apply"
+fi
+
+exit 0

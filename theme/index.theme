@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=Omagtk
+Comment=GTK3 theme that follows the current Omarchy theme
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=Omagtk
