@@ -7,6 +7,8 @@ checkboxes, sliders, tabs, lists, menus, selections, info bars, and the
 symbolic icons inside them. It works with dark and light Omarchy themes, and it
 leaves your icon theme alone.
 
+![Thunar and the Omagtk showcase following Tokyo Night, Vantablack, White, Catppuccin and Everforest](docs/omagtk.gif)
+
 <p align="center">
   <img src="docs/tokyo-night-controls.png" alt="Omagtk with Tokyo Night" width="49%">
   <img src="docs/catppuccin-latte-controls.png" alt="Omagtk with Catppuccin Latte" width="49%">
